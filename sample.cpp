@@ -789,54 +789,17 @@ InitLists( )
 	if (DebugOn != 0)
 		fprintf(stderr, "Starting InitLists.\n");
 
-	float dx = 1.; 
-	float dy = 0.5;
-	// float dy = BOXSIZE / 2.f;
-	float dz = 1.;
+	float dx = 2.; 
+	float dy = 2.;
+	float dz = 2.;
 	glutSetWindow( MainWindow );
 
 	// create the object:
 
 	BoxList = glGenLists( 1 );
 	glNewList( BoxList, GL_COMPILE );
-		glRotatef( 30, 1., 0.5, 0.5 );
-		glBegin( GL_QUADS );
-			glColor3f( 0., 0., 1. );
-				glVertex3f(  dx, -dy,  dz );
-				glVertex3f(  dx, -dy, -dz );
-				glVertex3f(  dx,  dy, -dz );
-				glVertex3f(  dx,  dy,  dz );
-				
-				glVertex3f( -dx, -dy,  dz);
-				glVertex3f( -dx,  dy,  dz );
-				glVertex3f( -dx,  dy, -dz );
-				glVertex3f( -dx, -dy, -dz );
-				
-				glVertex3f( -dx,  dy,  dz );
-				glVertex3f(  dx,  dy,  dz );
-				glVertex3f(  dx,  dy, -dz );
-				glVertex3f( -dx,  dy, -dz );
-				
-				glVertex3f( -dx, -dy,  dz);
-				glVertex3f( -dx, -dy, -dz );
-				glVertex3f(  dx, -dy, -dz );
-				glVertex3f(  dx, -dy,  dz );
-				
-				glVertex3f(-dx, -dy, dz);
-				glVertex3f( dx, -dy, dz);
-				glVertex3f( dx,  dy, dz);
-				glVertex3f(-dx,  dy, dz);
-				
-				glVertex3f(-dx, -dy, -dz);
-				glVertex3f(-dx,  dy, -dz);
-				glVertex3f( dx,  dy, -dz);
-				glVertex3f( dx, -dy, -dz);
-		glEnd();
-		
-		float numsegs = 9.;
-		float radius = 0.1f;
-		// height
-		float newdy = dy + 1.f;
+		float numsegs = 50.;
+		float radius = 2.f;
 		float ang = 0.;
 		float dang = 2. *M_PI / (float)(numsegs - 1);
 		float x = 0., z = 0.;
@@ -844,234 +807,20 @@ InitLists( )
 		// Center position of the cylinder base
 		float centerX = 0.;
 		float centerZ = 0.;
-		// Joystick
-		// Sides of prism
-		glBegin( GL_QUAD_STRIP );
-			glColor3f( 1., 0., 0. );
-				ang = 0.0f;
-				for( int i = 0; i <= numsegs; i++ )
-				{
-					x = centerX + radius * cos(ang);
-					z = centerZ + radius * sin(ang);
-					nx = cos(ang);
-					nz = sin(ang);
-					glNormal3f(nx, 0.0f, nz);
-					// Vertex at the top
-					glVertex3f( x, newdy, z );
-					// Vertex at the bottom
-					glVertex3f( x, dy, z );
-					ang += dang;
-				}
-		glEnd();
-		// Bottom cap
-		glBegin( GL_TRIANGLE_FAN );
+		glBegin( GL_LINE_STRIP );
 			glColor3f(1., 0., 0.);
 			// Center Vertex
 			glNormal3f(0.0f, -1.0f, 0.0f);
-			glVertex3f( centerX, dy, centerZ );
 			ang = 0.0f;
 			for( int i = 0; i <= numsegs; i++ )
 			{
 				x = centerX + radius * cos(ang);
 				z = centerZ + radius * sin(ang);
 				// Perimeter Vertices
-				glVertex3f( x, dy, z );
+				glVertex3f( x, 0., z );
 				ang += dang;
 			}
 		glEnd();
-		// Top cap
-		glBegin( GL_TRIANGLE_FAN );
-			glColor3f(1., 0., 0.);
-			glNormal3f(0.0f, 1.0f, 0.0f);
-				glVertex3f( centerX, newdy, centerZ );
-				ang = 2. * M_PI;
-				for( int i = 0; i <= numsegs; i++ )
-					{
-						x = centerX + radius * cos(ang);
-						z = centerZ + radius * sin(ang);
-						// Perimeter Vertices
-						glVertex3f( x, newdy, z );
-						ang -= dang;
-					}
-		glEnd();
-		// joystick rotation rubbers
-		numsegs = 25.;
-		radius = 0.3f;
-		newdy = dy + 0.10f;
-		dang = 2. *M_PI / (float)(numsegs - 1);
-		ang = 0.;
-		x = 0.;
-		z = 0.;
-		nx = 0.;
-		nz = 0.;
-		// Center position of the cylinder base
-		centerX = 0.;
-		centerZ = 0.;
-		// Sides of prism
-		glBegin( GL_QUAD_STRIP );
-			glColor3f( 1., 1., 0. );
-				ang = 0.0f;
-				for( int i = 0; i <= numsegs; i++ )
-				{
-					x = centerX + radius * cos(ang);
-					z = centerZ + radius * sin(ang);
-					nx = cos(ang);
-					nz = sin(ang);
-					glNormal3f(nx, 0.0f, nz);
-					// Vertex at the top
-					glVertex3f( x, newdy, z );
-					// Vertex at the bottom
-					glVertex3f( x, dy, z );
-					ang += dang;
-				}
-		glEnd();
-		// Bottom cap
-		glBegin( GL_TRIANGLE_FAN );
-			glColor3f(1., 1., 0.);
-			glNormal3f(0.0f, -1.0f, 0.0f);
-			glVertex3f( centerX, dy, centerZ );
-			ang = 0.0f;
-			for( int i = 0; i <= numsegs; i++ )
-			{
-				x = centerX + radius * cos(ang);
-				z = centerZ + radius * sin(ang);
-				// Perimeter Vertices
-				glVertex3f( x, dy, z );
-				ang += dang;
-			}
-		glEnd();
-		// Top cap
-		glBegin( GL_TRIANGLE_FAN );
-			glColor3f(1., 1., 0.);
-			// Center Vertex
-			glNormal3f(0.0f, 1.0f, 0.0f);
-				glVertex3f( centerX, newdy, centerZ );
-				ang = 2. * M_PI;
-				for( int i = 0; i <= numsegs; i++ )
-					{
-						x = centerX + radius * cos(ang);
-						z = centerZ + radius * sin(ang);
-						// Perimeter Vertices
-						glVertex3f( x, newdy, z );
-						ang -= dang;
-					}
-		glEnd();		
-		numsegs = 35.;
-		radius = 0.5f;
-		dang = 2. *M_PI / (float)(numsegs - 1);
-		ang = 0.;
-		newdy = dy + 0.05f;
-		x = 0.;
-		z = 0.;
-		nx = 0.;
-		nz = 0.;
-		// Center position of the cylinder base
-		centerX = 0.;
-		centerZ = 0.;
-		// Sides of prism
-		glBegin( GL_QUAD_STRIP );
-			glColor3f( 0., 1., 1. );
-				ang = 0.0f;
-				for( int i = 0; i <= numsegs; i++ )
-				{
-					x = centerX + radius * cos(ang);
-					z = centerZ + radius * sin(ang);
-					nx = cos(ang);
-					nz = sin(ang);
-					glNormal3f(nx, 0.0f, nz);
-					glVertex3f( x, newdy, z );
-					glVertex3f( x, dy, z );
-					ang += dang;
-				}
-		glEnd();
-		// Bottom cap
-		glBegin( GL_TRIANGLE_FAN );
-			glColor3f(0., 1., 1.);
-			// Center Vertex
-			glNormal3f(0.0f, -1.0f, 0.0f);
-			glVertex3f( centerX, dy, centerZ );
-			ang = 0.0f;
-			for( int i = 0; i <= numsegs; i++ )
-			{
-				x = centerX + radius * cos(ang);
-				z = centerZ + radius * sin(ang);
-				// Perimeter Vertices
-				glVertex3f( x, dy, z );
-				ang += dang;
-			}
-		glEnd();
-		// Top cap
-		glBegin( GL_TRIANGLE_FAN );
-			glColor3f(0., 1., 1.);
-			// Center Vertex
-			glNormal3f(0.0f, 1.0f, 0.0f);
-				glVertex3f( centerX, newdy, centerZ );
-				ang = 2. * M_PI;
-				for( int i = 0; i <= numsegs; i++ )
-					{
-						x = centerX + radius * cos(ang);
-						z = centerZ + radius * sin(ang);
-						// Perimeter Vertices
-						glVertex3f( x, newdy, z );
-						ang -= dang;
-					}
-		glEnd();
-		// button
-		numsegs = 20.;
-		radius = 0.15f;
-		newdy = dy + 0.05f; 
-		dang = 2. * M_PI / numsegs;
-		centerX = -0.6f;
-		centerZ = 0.6f;
-		// Sides of prism
-		glBegin( GL_QUAD_STRIP );
-			glColor3f( 0., 1., 0. );
-				ang = 0.0f;
-				for( int i = 0; i <= numsegs; i++ )
-				{
-					x = centerX + radius * cos(ang);
-					z = centerZ + radius * sin(ang);
-					nx = cos(ang);
-					nz = sin(ang);
-					glNormal3f(nx, 0.0f, nz);
-					glVertex3f( x, newdy, z );
-					glVertex3f( x, dy, z );
-					ang += dang;
-				}
-		glEnd();
-		// Bottom cap
-		glBegin( GL_TRIANGLE_FAN );
-			glColor3f(0., 1., 0.);
-			// Center Vertex
-			glNormal3f(0.0f, -1.0f, 0.0f);
-			glVertex3f( centerX, dy, centerZ );
-			ang = 0.0f;
-			for( int i = 0; i <= numsegs; i++ )
-			{
-				x = centerX + radius * cos(ang);
-				z = centerZ + radius * sin(ang);
-				// Perimeter Vertices
-				glVertex3f( x, dy, z );
-				ang += dang;
-			}
-		glEnd();
-		// Top cap
-		glBegin( GL_TRIANGLE_FAN );
-			glColor3f(0., 1., 0.);
-			// Center Vertex
-			glNormal3f(0.0f, 1.0f, 0.0f);
-				glVertex3f( centerX, newdy, centerZ );
-				ang = 2. * M_PI;
-				for( int i = 0; i <= numsegs; i++ )
-					{
-						x = centerX + radius * cos(ang);
-						z = centerZ + radius * sin(ang);
-						// Perimeter Vertices
-						glVertex3f( x, newdy, z );
-						ang -= dang;
-					}
-		glEnd();
-		
 
 #ifdef NOTDEF
 		glColor3f(1., 1., 1.);
