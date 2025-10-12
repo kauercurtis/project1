@@ -173,7 +173,13 @@ const float	WHITE[ ] = { 1.,1.,1.,1. };
 
 const int MS_PER_CYCLE = 10000;		// 10000 milliseconds = 10 seconds
 
-
+// Variables for circle calculations
+const float Centerx = 0.f;
+const float Centerz = 0.f;
+const float Radius = 2.f;
+const int Vertices = 50;
+const float Dang = 2. *M_PI / (float)(Vertices - 1);
+float StartAng = 0.f;
 // what options should we compile-in?
 // in general, you don't need to worry about these
 // i compile these in to show class examples of things going wrong
@@ -184,6 +190,7 @@ const int MS_PER_CYCLE = 10000;		// 10000 milliseconds = 10 seconds
 // non-constant global variables:
 
 int		ActiveButton;			// current button that is down
+float   Angle = 0.0f;
 GLuint	AxesList;				// list to hold the axes
 int		AxesOn;					// != 0 means to draw the axes
 GLuint	BoxList;
@@ -405,7 +412,7 @@ Display( )
 		glDisable( GL_DEPTH_TEST );
 #endif
 
-
+	
 	// specify shading to be flat:
 
 	glShadeModel( GL_FLAT );
@@ -479,17 +486,55 @@ Display( )
 
 	glEnable( GL_NORMALIZE );
 
-
 	// draw the box object by calling up its display list:
-
-	glCallList( BoxList );
-
+	// glPushMatrix();
+		// glCallList( BoxList );
+	// glPopMatrix();
+	// Animated horse
+	/*glPushMatrix();
+		float x = 2.0f * sin( 2. * ( 2. * F_PI * Time ) );
+		glTranslatef( x, 0., 0. );
+		glCallList( SolidHorseList );
+	glPopMatrix();*/
+	
+	/*
+	 BoxList = glGenLists( 1 );
+	glNewList( BoxList, GL_COMPILE );
+			glColor3f(1., 0., 0.);
+			// Center Vertex
+			glNormal3f(0.0f, -1.0f, 0.0f);
+			ang = 0.0f;
+			for( int i = 0; i <= numsegs; i++ )
+			{
+				x = centerX + radius * cos(ang);
+				z = centerZ + radius * sin(ang);
+				// Perimeter Vertices
+				glVertex3f( x, 0., z );
+				ang += dang;
+			}
+		glEnd();
+	*/
+	
+	glPushMatrix();
+		float angle = 2.0f * ( 2.f * ( 2.0f * M_PI * Time ) );
+		float x = Radius * cos( angle );
+		float z = Radius * sin( angle );
+		float rotation = angle * ( 180.0f / M_PI ) + 90.0f;
+		glTranslatef( x, 0.0f, z );
+		glRotatef( rotation, 0.0f, 1.5f, 0.0f );
+		glCallList( SolidHorseList );
+	glPopMatrix();
+	
+	glPushMatrix();
+		glCallList( BoxList );
+	glPopMatrix();
+	
 #ifdef DEMO_Z_FIGHTING
 	if( DepthFightingOn != 0 )
 	{
 		glPushMatrix( );
 			glRotatef( 90.f,   0.f, 1.f, 0.f );
-			glCallList( BoxList );
+			glCallList( SolidHorseList );
 		glPopMatrix( );
 	}
 #endif
@@ -794,39 +839,12 @@ InitLists( )
 	float dy = 2.;
 	float dz = 2.;
 	glutSetWindow( MainWindow );
-
-	// circle
-	BoxList = glGenLists( 1 );
-	glNewList( BoxList, GL_COMPILE );
-		float numsegs = 50.;
-		float radius = 2.f;
-		float ang = 0.;
-		float dang = 2. *M_PI / (float)(numsegs - 1);
-		float x = 0., z = 0.;
-		float nx = 0., nz = 0.;
-		// Center position of the cylinder base
-		float centerX = 0.;
-		float centerZ = 0.;
-		glBegin( GL_LINE_STRIP );
-			glColor3f(1., 0., 0.);
-			// Center Vertex
-			glNormal3f(0.0f, -1.0f, 0.0f);
-			ang = 0.0f;
-			for( int i = 0; i <= numsegs; i++ )
-			{
-				x = centerX + radius * cos(ang);
-				z = centerZ + radius * sin(ang);
-				// Perimeter Vertices
-				glVertex3f( x, 0., z );
-				ang += dang;
-			}
-		glEnd();
-		
+	
 	SolidHorseList = glGenLists( 1 );
 	glNewList( SolidHorseList, GL_COMPILE );
 		glPushMatrix( );
 			glRotatef(90.f, 0., 1., 0.);
-			glTranslatef( 0., -1.1f, 0.f);
+			glTranslatef( 0.f, -1.1f, 0.f);
 			glBegin( GL_TRIANGLES );
 				for( int i = 0; i < HORSEntris; i++ )
 				{
@@ -856,6 +874,27 @@ InitLists( )
 			glEnd( );
 		glPopMatrix( );
 	glEndList( );	
+	
+	// circle
+	BoxList = glGenLists( 1 );
+	glNewList( BoxList, GL_COMPILE );
+		float ang = 0.;
+		float x = 0., z = 0.;
+		float nx = 0., nz = 0.;
+		glBegin( GL_LINE_STRIP );
+			glColor3f(1., 0., 0.);
+			// Center Vertex
+			glNormal3f(0.0f, -1.0f, 0.0f);
+			ang = 0.0f;
+			for( int i = 0; i <= Vertices; i++ )
+			{
+				x = Centerx + Radius * cos(ang);
+				z = Centerz + Radius * sin(ang);
+				// Perimeter Vertices
+				glVertex3f( x, 0., z );
+				ang += Dang;
+			}
+		glEnd();
 
 #ifdef NOTDEF
 		glColor3f(1., 1., 1.);
