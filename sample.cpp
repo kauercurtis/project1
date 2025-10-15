@@ -101,7 +101,9 @@ const int RIGHT  = 1;
 enum Projections
 {
 	ORTHO,
-	PERSP
+	PERSP,
+	OUTSIDE,
+	INSIDE
 };
 
 // which button:
@@ -180,6 +182,7 @@ const float Radius = 2.f;
 const int Vertices = 50;
 const float Dang = 2. *M_PI / (float)(Vertices - 1);
 float StartAng = 0.f;
+
 // what options should we compile-in?
 // in general, you don't need to worry about these
 // i compile these in to show class examples of things going wrong
@@ -435,17 +438,25 @@ Display( )
 	glLoadIdentity( );
 	if( NowProjection == ORTHO )
 		glOrtho( -2.f, 2.f,     -2.f, 2.f,     0.1f, 1000.f );
+	else if( NowProjection == INSIDE )
+		gluPerspective( 70.f, 1.f,	0.1f, 1000.f );
+	else if( NowProjection == OUTSIDE )
+		gluPerspective( 90.f, 1.f,	0.1f, 1000.f );
 	else
 		gluPerspective( 70.f, 1.f,	0.1f, 1000.f );
-
 	// place the objects into the scene:
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity( );
 
 	// set the eye position, look-at position, and up-vector:
-
-	gluLookAt( 0.f, 0.f, 3.f,     0.f, 0.f, 0.f,     0.f, 1.f, 0.f );
+	
+	if( NowProjection == OUTSIDE )
+		gluLookAt( 2.f, 2.f, 2.f,     0.f, -1.f, 0.f,     0.f, 1.f, 0.f );
+	else if( NowProjection == INSIDE )
+		gluLookAt( 0.f, 0.2f, 0.f,     2.f, 0.f, 0.f,     0.f, 1.f, 0.f );
+	else
+		gluLookAt( 0.f, 0.f, 3.f,     0.f, 0.f, 0.f,     0.f, 1.f, 0.f );
 
 	// rotate the scene:
 
@@ -497,31 +508,16 @@ Display( )
 		glCallList( SolidHorseList );
 	glPopMatrix();*/
 	
-	/*
-	 BoxList = glGenLists( 1 );
-	glNewList( BoxList, GL_COMPILE );
-			glColor3f(1., 0., 0.);
-			// Center Vertex
-			glNormal3f(0.0f, -1.0f, 0.0f);
-			ang = 0.0f;
-			for( int i = 0; i <= numsegs; i++ )
-			{
-				x = centerX + radius * cos(ang);
-				z = centerZ + radius * sin(ang);
-				// Perimeter Vertices
-				glVertex3f( x, 0., z );
-				ang += dang;
-			}
-		glEnd();
-	*/
-	
 	glPushMatrix();
-		float angle = 2.0f * ( 2.f * ( 2.0f * M_PI * Time ) );
+		// revolve around circle and bob up and down
+		float angle = 2.0f * ( 2.f * ( 0.5f * M_PI * Time ) );
 		float x = Radius * cos( angle );
 		float z = Radius * sin( angle );
-		float rotation = angle * ( 180.0f / M_PI ) + 90.0f;
-		glTranslatef( x, 0.0f, z );
-		glRotatef( rotation, 0.0f, 1.5f, 0.0f );
+		float y_offset = sin( 5. * ( 1. * M_PI * Time ) );
+		glTranslatef( x, y_offset, z );
+		// rock back in forth
+		float theta = 45.f * sin( 2. * ( 1. * M_PI * Time ) );
+		glRotatef( theta, 0., 0., 1. );
 		glCallList( SolidHorseList );
 	glPopMatrix();
 	
@@ -994,6 +990,16 @@ Keyboard( unsigned char c, int x, int y )
 
 	switch( c )
 	{
+		case 'a':
+		case 'A':
+			NowProjection = OUTSIDE;
+			break;
+			
+		case 's':
+		case 'S':
+			NowProjection = INSIDE;
+			break;
+			
 		case 'o':
 		case 'O':
 			NowProjection = ORTHO;
