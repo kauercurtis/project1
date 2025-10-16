@@ -459,15 +459,17 @@ Display( )
 		gluLookAt( 0.f, 0.f, 3.f,     0.f, 0.f, 0.f,     0.f, 1.f, 0.f );
 
 	// rotate the scene:
-
-	glRotatef( (GLfloat)Yrot, 0.f, 1.f, 0.f );
-	glRotatef( (GLfloat)Xrot, 1.f, 0.f, 0.f );
-
+	if( NowProjection != INSIDE )
+	{
+		glRotatef( (GLfloat)Yrot, 0.f, 1.f, 0.f );
+		glRotatef( (GLfloat)Xrot, 1.f, 0.f, 0.f );
+	}
 	// uniformly scale the scene:
 
 	if( Scale < MINSCALE )
 		Scale = MINSCALE;
-	glScalef( (GLfloat)Scale, (GLfloat)Scale, (GLfloat)Scale );
+	if( NowProjection == INSIDE )
+		glScalef( (GLfloat)Scale, (GLfloat)Scale, (GLfloat)Scale );
 
 	// set the fog parameters:
 
@@ -497,26 +499,16 @@ Display( )
 
 	glEnable( GL_NORMALIZE );
 
-	// draw the box object by calling up its display list:
-	// glPushMatrix();
-		// glCallList( BoxList );
-	// glPopMatrix();
-	// Animated horse
-	/*glPushMatrix();
-		float x = 2.0f * sin( 2. * ( 2. * F_PI * Time ) );
-		glTranslatef( x, 0., 0. );
-		glCallList( SolidHorseList );
-	glPopMatrix();*/
-	
 	glPushMatrix();
 		// revolve around circle and bob up and down
 		float angle = 2.0f * ( 2.f * ( 0.5f * M_PI * Time ) );
 		float x = Radius * cos( angle );
 		float z = Radius * sin( angle );
-		float y_offset = sin( 5. * ( 1. * M_PI * Time ) );
+		float y_offset = sin( 3. * ( 1. * M_PI * Time ) );
 		glTranslatef( x, y_offset, z );
-		// rock back in forth
-		float theta = 45.f * sin( 2. * ( 1. * M_PI * Time ) );
+		
+		// rock back and forth
+		float theta = 45.f * sin( 5. * ( 1. * M_PI * Time ) );
 		glRotatef( theta, 0., 0., 1. );
 		glCallList( SolidHorseList );
 	glPopMatrix();
